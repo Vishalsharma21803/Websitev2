@@ -7,10 +7,6 @@ minutes: 3
 placeholder: true
 ---
 
-> Placeholder body. The title above is from the live Sifars blog; import the original article before launch.
-
-The shifts in AI, automation and architecture shaping custom software this year.
-
 ## Start with the outcome
 
 Before choosing tools or vendors, write down what has to work: who uses the system, which data it touches, and what happens when something goes wrong. That list becomes the brief every later decision is checked against.

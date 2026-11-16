@@ -7,10 +7,6 @@ minutes: 3
 placeholder: true
 ---
 
-> Placeholder body. The title above is from the live Sifars blog; import the original article before launch.
-
-Why a custom mobile partner beats templates once your app has to carry real users, data and integrations.
-
 ## Start with the outcome
 
 Before choosing tools or vendors, write down what has to work: who uses the system, which data it touches, and what happens when something goes wrong. That list becomes the brief every later decision is checked against.

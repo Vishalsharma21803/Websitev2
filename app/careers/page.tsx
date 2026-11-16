@@ -17,11 +17,8 @@ export default function Careers() {
     <>
       <PageHead
         status="Careers"
-        title={
-          <>
-            A great team, and a career <span className="live">to build with it.</span>
-          </>
-        }
+        titleParts={['A great team, and a career', { live: 'to build with it.' }]}
+        art={{ kind: 'team', caption: 'Small teams, one standard · illustrative' }}
         lead="We are not hiring for open roles right now. We still read every application and reach out when a matching role opens."
       />
       <section className="wrap section vals" aria-label="How we work">

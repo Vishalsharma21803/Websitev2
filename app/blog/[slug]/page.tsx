@@ -33,7 +33,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
   const next = posts[(i + 1) % posts.length];
   return (
     <>
-      <PageHead status="Blog" crumbs={[{ label: 'Blog', href: '/blog/' }, { label: p.category, href: `/blog/${p.slug}/` }]} title={p.title} lead={p.description}>
+      <PageHead variant="post" status="Blog" crumbs={[{ label: 'Blog', href: '/blog/' }, { label: p.category, href: `/blog/${p.slug}/` }]} title={p.title} lead={p.description}>
         <p className="mono post-meta">
           {fmtDate(p.date)} · {p.minutes} min read
         </p>

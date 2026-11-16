@@ -12,7 +12,7 @@ import { Agent, Flow, MobileApp, WebPlatform } from './Deliverables';
 const LAYOUT = [
   { pos: new THREE.Vector3(-2.15, 1.42, -0.8), rotY: 0.34, dist: 5.2, lift: 0.35 },
   { pos: new THREE.Vector3(0.2, 0.98, 0.7), rotY: -0.1, dist: 4.3, lift: 0.2 },
-  { pos: new THREE.Vector3(2.45, 0.92, -0.55), rotY: -0.42, dist: 4.4, lift: 0.25 },
+  { pos: new THREE.Vector3(2.45, 0.92, -0.55), rotY: -0.42, dist: 5.9, lift: 0.25, look: 0.95 },
   { pos: new THREE.Vector3(-0.1, 0, 2.6), rotY: 0, dist: 0, lift: 0 },
 ];
 
@@ -90,8 +90,9 @@ function Rig({ reduced }: { reduced: boolean }) {
     ptr.y += (ptr.ty - ptr.y) * kp;
     const open = 1 - phase.intro; // camera dollies in during the opening sequence
     const heroClose = 1 - smooth(0.02, 0.12, p);
-    const radius = (narrow ? 15 : 11.2 - heroClose * 0.5) + open * 1.6;
-    const az = 0.42 - Math.min(p, 0.44) * 1.25 + open * 0.22 + (reduced ? 0 : ptr.x * 0.05);
+    const radius = (narrow ? 23 : 11.2 + heroClose * 4.2) + open * 1.6;
+    // Phones hold the compact angle that fits all four objects; wider screens orbit through the chapters.
+    const az = (narrow ? -0.05 : 0.42 - Math.min(p, 0.44) * 1.25) + open * 0.22 + (reduced ? 0 : ptr.x * 0.05);
     const height = (narrow ? 5.4 : 4.1) - Math.min(p, 0.44) * 1.2 + open * 0.9 - (reduced ? 0 : ptr.y * 0.25);
     tmpLook.set(0.05, 0.55, 0.45);
     tmpPos.set(Math.sin(az) * radius + tmpLook.x, height, Math.cos(az) * radius + tmpLook.z);
@@ -99,11 +100,13 @@ function Rig({ reduced }: { reduced: boolean }) {
     if (phase.focus >= 0) {
       const L = LAYOUT[phase.focus];
       if (phase.focus === 3) {
-        focusLook.copy(L.pos).add(new THREE.Vector3(0, 0.2, 0));
-        focusPos.set(L.pos.x + 0.8, L.pos.y + (narrow ? 5.2 : 3.7), L.pos.z + (narrow ? 6.8 : 5.4));
+        // Aim left of the line so it settles right of the copy card.
+        focusLook.copy(L.pos).add(new THREE.Vector3(narrow ? 0 : 0.1, 0.2, 0));
+        focusPos.set(L.pos.x + 0.9, L.pos.y + (narrow ? 5.6 : 5.5), L.pos.z + (narrow ? 7.4 : 9.1));
       } else {
         const n = new THREE.Vector3(Math.sin(L.rotY), 0, Math.cos(L.rotY));
-        focusLook.copy(L.pos);
+        const side = new THREE.Vector3(Math.cos(L.rotY), 0, -Math.sin(L.rotY));
+        focusLook.copy(L.pos).addScaledVector(side, (L as { look?: number }).look ?? 0);
         focusPos.copy(L.pos).addScaledVector(n, L.dist * (narrow ? 1.55 : 1)).add(new THREE.Vector3(0, L.lift, 0));
       }
       tmpPos.lerp(focusPos, phase.focusMix);
@@ -116,11 +119,11 @@ function Rig({ reduced }: { reduced: boolean }) {
     camera.lookAt(look.current);
 
     // Shift the drawing away from the copy column.
-    const target = narrow ? 0 : p < 0.09 ? 0.215 : phase.focus >= 0 ? 0.22 : 0.03;
+    const target = narrow ? 0 : p < 0.09 ? (size.width / size.height > 1.45 ? 0.19 : 0.22) : phase.focus === 3 ? 0.23 : phase.focus >= 0 ? 0.22 : 0.03;
     shift.current += (target - shift.current) * k;
     const cam = camera as THREE.PerspectiveCamera;
-    const chapterLift = p >= 0.09 && phase.focus < 0 ? 0.1 : 0;
-    yLift.current += ((narrow ? 0.17 : chapterLift) - yLift.current) * k;
+    const chapterLift = p >= 0.09 && phase.focus < 0 ? 0.06 : 0;
+    yLift.current += ((narrow ? 0.06 : chapterLift) - yLift.current) * k;
     const yShift = yLift.current;
     cam.setViewOffset(size.width, size.height, -size.width * shift.current, size.height * yShift, size.width, size.height);
   });
@@ -156,8 +159,8 @@ function World({ reduced }: { reduced: boolean }) {
         sectionSize={1}
         sectionThickness={1}
         sectionColor={pal.gridMajor}
-        fadeDistance={26}
-        fadeStrength={1.6}
+        fadeDistance={20}
+        fadeStrength={2.2}
         infiniteGrid
       />
       <Shadows pal={pal} />
@@ -219,7 +222,7 @@ export function SoloCanvas({ which }: { which: 0 | 1 | 2 | 3 }) {
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
   const Obj = [WebPlatform, MobileApp, Agent, Flow][which];
-  const cam: [number, number, number] = which === 3 ? [1.0, 2.6, 4.6] : which === 1 ? [1.0, 0.5, 3.6] : [1.3, 0.6, 5.0];
+  const cam: [number, number, number] = which === 3 ? [1.3, 3.4, 6.0] : which === 1 ? [1.4, 0.65, 6.6] : [1.7, 0.8, 6.8];
   if (!ready) return null;
   return (
     <Canvas className="solo-canvas" dpr={[1, 1.75]} camera={{ fov: 30, position: cam }} gl={{ antialias: true, alpha: true }} flat aria-hidden="true">

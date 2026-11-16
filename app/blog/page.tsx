@@ -13,11 +13,7 @@ export default function Blog() {
     <>
       <PageHead
         status="Blog"
-        title={
-          <>
-            Notes from the <span className="live">drawing board.</span>
-          </>
-        }
+        titleParts={['Notes from the', { live: 'drawing board.' }]}
         lead="Guides and thinking on custom software, AI and automation, from the team that builds it."
       />
       <section className="wrap blog" aria-label="Articles">

@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { nav, site } from '@/lib/site';
 import { practices } from '@/lib/services';
-import { Logo } from './Logo';
 import { Clock } from './Clock';
+import { FootMark } from './FootMark';
 
 export function Footer() {
   return (
@@ -10,10 +10,7 @@ export function Footer() {
       <div className="wrap">
         <div className="foot-grid">
           <div className="foot-brand">
-            <Link href="/" aria-label="Sifars home">
-              <Logo size={36} />
-            </Link>
-            <p>Websites, mobile apps, AI agents and automation, engineered from blueprint to production.</p>
+            <p className="foot-lead">Websites, mobile apps, AI agents and automation, engineered from blueprint to production.</p>
             <p className="foot-clock mono">
               <span className="dot" aria-hidden="true" /> Mohali, India · <Clock /> IST
             </p>
@@ -62,12 +59,10 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <p className="foot-mega" aria-hidden="true">
-          sifars
-        </p>
+        <FootMark />
         <div className="foot-legal">
           <span>© {new Date().getFullYear()} Sifars. Fourth Floor, Blue Sapphire, Sector 74, Mohali.</span>
-          <span className="mono">Design preview · v2</span>
+          <span className="mono">Engineered in Mohali, India</span>
         </div>
       </div>
     </footer>

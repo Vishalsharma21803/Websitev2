@@ -234,6 +234,8 @@ export function Anno({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const size = useThree((s) => s.size);
+  const camera = useThree((s) => s.camera);
+  const proj = useMemo(() => new THREE.Vector3(), []);
   useEffect(() => {
     (line.material as LineMaterial).resolution.set(size.width, size.height);
   }, [size, line]);
@@ -251,7 +253,22 @@ export function Anno({
   useFrame(() => {
     const inFocus = phase.focus === index ? phase.focusMix : 0;
     const focusVis = detail ? inFocus : phase.focus < 0 ? 1 : phase.focus === index ? 1 : 1 - phase.focusMix;
-    const o = (strong ? Math.max(phase.figs, phase.annotate) : phase.annotate) * focusVis;
+    let o = (strong ? Math.max(phase.figs, phase.annotate) : phase.annotate) * focusVis;
+    // Keep labels out of the header band and inside the viewport; small screens show figure labels only.
+    if (!strong && size.width < 760) o = 0;
+    if (o > 0 && label.current) {
+      proj.set(...to);
+      line.localToWorld(proj);
+      proj.project(camera);
+      const sx = (proj.x * 0.5 + 0.5) * size.width;
+      const sy = (-proj.y * 0.5 + 0.5) * size.height;
+      // Measure the whole label, not just its anchor, against the safe area.
+      const w = label.current.offsetWidth || 120;
+      const left = align === 'right' ? sx - w : strong ? sx - w / 2 : sx;
+      const edge = Math.min(left - 8, size.width - (left + w) - 8, sy - 84, size.height - sy - 8);
+      if (edge < 0) o = 0;
+      else if (edge < 40) o *= edge / 40;
+    }
     (line.material as LineMaterial).opacity = o * 0.9;
     if (label.current) {
       label.current.style.opacity = String(o);

@@ -190,7 +190,7 @@ export function Assembly() {
                   <p>{prac.under}</p>
                 </div>
                 <Link className="link" href={`/services/${prac.slug}/`}>
-                  Explore {d.title.toLowerCase()} <Arrow />
+                  {d.cta} <Arrow />
                 </Link>
                 <div className="asm-dots" aria-hidden="true">
                   {deliverables.map((x, i) => (

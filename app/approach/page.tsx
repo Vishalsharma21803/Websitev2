@@ -12,11 +12,8 @@ export default function Approach() {
     <>
       <PageHead
         status="Approach"
-        title={
-          <>
-            The simple solution usually stops before <span className="live">the real system begins.</span>
-          </>
-        }
+        titleParts={['The simple solution usually stops before', { live: 'the real system begins.' }]}
+        art={{ kind: 'layers', caption: 'The Sifars Production Layer · six parts, mapped before the build' }}
         lead="A no-code tool can start a workflow. A plugin can connect two systems. A prototype can prove an idea. Production is different: real users, real data, edge cases, integrations, monitoring, and someone accountable when it has to work."
       />
       <Schematic />

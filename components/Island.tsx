@@ -30,6 +30,32 @@ export function Island() {
 
   useEffect(() => setOpen(false), [path]);
 
+  // Let the header adapt to what is under it: no scrim over the 3D stage, inverted over dark panels.
+  const [under, setUnder] = useState<'' | 'on-stage' | 'on-dark'>('');
+  useEffect(() => {
+    let raf = 0;
+    const check = () => {
+      const hit = (sel: string) =>
+        [...document.querySelectorAll<HTMLElement>(sel)].some((el) => {
+          const r = el.getBoundingClientRect();
+          return r.top < 64 && r.bottom > 24;
+        });
+      setUnder(hit('.start-sheet') ? 'on-dark' : hit('.asm-stage') ? 'on-stage' : '');
+      raf = 0;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [path]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -52,9 +78,14 @@ export function Island() {
   }, [open]);
 
   return (
-    <header className="top">
+    <header className={`top ${under}`}>
       <Link href="/" className="top-logo" aria-label="Sifars home">
-        <Logo size={30} />
+        <span className="top-logo-full">
+          <Logo size={30} />
+        </span>
+        <span className="top-logo-mark">
+          <Logo size={30} word={false} />
+        </span>
       </Link>
 
       <div className="island-slot">

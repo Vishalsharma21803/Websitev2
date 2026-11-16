@@ -43,7 +43,7 @@ export function WebPlatform({ pal, index, delay, annotate = true }: ObjProps) {
           <Anno index={index} pal={pal} from={[1.3, 0.4, 0]} to={[1.95, 0.95, 0]} text={s[1]} />
           <Anno index={index} pal={pal} from={[-1.3, -0.6, 0]} to={[-1.95, -0.95, 0]} text={s[2]} detail align="right" />
           <Anno index={index} pal={pal} from={[1.72, -0.6, -0.55]} to={[2.35, -0.25, -0.55]} text={s[3]} detail />
-          <Anno index={index} pal={pal} from={[0, 0.83, 0]} to={[0, 1.45, 0]} text="Fig. 1 · Web platform" strong />
+          <Anno index={index} pal={pal} from={[0, 0.83, 0]} to={[0, 1.2, 0]} text="Fig. 1 · Web platform" strong />
         </>
       )}
     </group>
@@ -79,11 +79,11 @@ export function MobileApp({ pal, index, delay, annotate = true }: ObjProps) {
       <Screen width={0.76} height={1.62} px={[512, 1090]} mats={mats} pal={pal} paint={drawPhone} position={[0, 0, 0.044]} />
       {annotate && (
         <>
-          <Anno index={index} pal={pal} from={[-0.42, 0.7, 0]} to={[-0.95, 1.05, 0]} text={s[0]} align="right" />
-          <Anno index={index} pal={pal} from={[0.42, 0.5, 0]} to={[0.95, 0.85, 0]} text={s[1]} />
+          <Anno index={index} pal={pal} from={[0.42, 0.72, 0]} to={[1.0, 1.15, 0]} text={s[0]} detail />
+          <Anno index={index} pal={pal} from={[0.42, 0.42, 0]} to={[1.0, 0.72, 0]} text={s[1]} />
           <Anno index={index} pal={pal} from={[0.3, -0.1, 0.05]} to={[0.98, -0.25, 0]} text={s[2]} detail />
           <Anno index={index} pal={pal} from={[-0.42, -0.7, 0]} to={[-0.95, -1.0, 0]} text={s[3]} detail align="right" />
-          <Anno index={index} pal={pal} from={[0, -0.86, 0]} to={[0, -1.25, 0]} text="Fig. 2 · Mobile app" strong />
+          <Anno index={index} pal={pal} from={[0.42, -0.6, 0]} to={[0.95, -0.95, 0]} text="Fig. 2 · Mobile app" strong align="left" />
         </>
       )}
     </group>
@@ -137,10 +137,10 @@ export function Agent({ pal, index, delay, annotate = true }: ObjProps) {
       <Screen width={1.2} height={1.52} px={[640, 812]} mats={mats} pal={pal} paint={drawAgent} position={[0, 0, 0.037]} />
       {annotate && (
         <>
-          <Anno index={index} pal={pal} from={[-0.65, 0.6, 0]} to={[-1.2, 1.0, 0]} text={s[0]} align="right" />
+          <Anno index={index} pal={pal} from={[-0.3, 0.81, 0]} to={[-0.5, 1.12, 0]} text={s[0]} detail align="right" />
           <Anno index={index} pal={pal} from={[1.38, 0.5, 0]} to={[1.9, 0.9, 0]} text={s[1]} />
           <Anno index={index} pal={pal} from={[1.38, -0.5, 0]} to={[1.9, -0.85, 0]} text={s[2]} detail />
-          <Anno index={index} pal={pal} from={[-0.65, -0.62, 0]} to={[-1.2, -0.95, 0]} text={s[3]} detail align="right" />
+          <Anno index={index} pal={pal} from={[-0.3, -0.81, 0]} to={[-0.45, -1.2, 0]} text={s[3]} detail />
           <Anno index={index} pal={pal} from={[0.2, 0.81, 0]} to={[0.2, 1.38, 0]} text="Fig. 3 · AI agent" strong />
         </>
       )}
@@ -211,7 +211,7 @@ export function Flow({ pal, index, delay, annotate = true }: ObjProps) {
       ))}
       {annotate && (
         <>
-          <Anno index={index} pal={pal} from={[xs[0], 0.38, 0]} to={[xs[0] - 0.3, 0.95, 0]} text={s[0]} align="right" />
+          <Anno index={index} pal={pal} from={[xs[0], 0.38, 0]} to={[xs[0] + 0.1, 1.15, 0]} text={s[0]} />
           <Anno index={index} pal={pal} from={[xs[1], 0.38, 0]} to={[xs[1] + 0.1, 1.05, 0]} text={s[1]} />
           <Anno index={index} pal={pal} from={[xs[3], 0.38, 0]} to={[xs[3] - 0.1, 1.05, 0]} text={s[2]} detail align="right" />
           <Anno index={index} pal={pal} from={[xs[4], 0.38, 0]} to={[xs[4] + 0.3, 0.95, 0]} text={s[3]} detail />

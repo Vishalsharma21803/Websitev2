@@ -10,11 +10,8 @@ export default function Contact() {
     <>
       <PageHead
         status="Start a project"
-        title={
-          <>
-            Tell us what <span className="live">has to work.</span>
-          </>
-        }
+        titleParts={['Tell us what', { live: 'has to work.' }]}
+        art={{ kind: 'route', caption: 'How an enquiry moves · covered by an NDA from the first message' }}
         lead="Share the workflow, the users and the systems involved. Your idea stays yours: every enquiry is covered by a non-disclosure agreement."
       />
       <section className="wrap ct" aria-label="Contact">

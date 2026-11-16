@@ -1,12 +1,19 @@
 'use client';
 import { animate, useInView } from 'motion/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 /** Counts the leading number of a value like "85%", "99%+", "10×" or "40+" when it scrolls into view. */
 export function CountUp({ value, className }: { value: string; className?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '0px 0px -10% 0px' });
-  const m = value.match(/^(\D*)(\d+(?:\.\d+)?)(.*)$/);
+  const m = value.match(/^([~]?)(\d+(?:\.\d+)?)(.*)$/);
+  // Show the starting number straight away, so the final value never flashes before counting.
+  useLayoutEffect(() => {
+    if (!m || !ref.current) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    ref.current.textContent = `${m[1]}0${m[3]}`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     if (!inView || !m || !ref.current) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;

@@ -4,6 +4,8 @@ import { Reveal } from '@/components/Reveal';
 import { Quotes } from '@/components/home/Quotes';
 import { Start } from '@/components/home/Start';
 import { Clock } from '@/components/Clock';
+import { CountUp } from '@/components/CountUp';
+import { DrawSheet } from '@/components/DrawSheet';
 import { credentials, site } from '@/lib/site';
 
 export const metadata: Metadata = { title: 'About', description: 'Sifars is an engineering team in Mohali, India, building AI systems, automation and complex software for clients across the globe.' };
@@ -19,18 +21,16 @@ export default function About() {
     <>
       <PageHead
         status="About"
-        title={
-          <>
-            We were building AI systems before ChatGPT <span className="live">made it a buzzword.</span>
-          </>
-        }
+        titleParts={['We were building AI systems before ChatGPT', { live: 'made it a buzzword.' }]}
         lead="For over a decade we’ve shipped machine learning, automation and data systems into production. Sifars treats every project as a personal affair."
       >
         <dl className="cred">
           {credentials.map((c, i) => (
             <Reveal key={c.label} delay={i * 0.06}>
               <dt className="mono">{c.label}</dt>
-              <dd>{c.value}</dd>
+              <dd>
+                <CountUp value={c.value} />
+              </dd>
             </Reveal>
           ))}
         </dl>
@@ -58,6 +58,7 @@ export default function About() {
       <Quotes />
 
       <section className="wrap section" aria-labelledby="office-h">
+        <DrawSheet kind="office" caption="Illustrative floor plan · Mohali, Punjab" />
         <div className="office sheet">
           <span className="ticks" aria-hidden="true" />
           <h2 id="office-h" className="h2">

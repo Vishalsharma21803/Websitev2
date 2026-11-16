@@ -22,8 +22,8 @@ export function palette(theme: Theme): Palette {
         screen: '#11151b',
         blue: '#6e8dff',
         blueSoft: '#1c2648',
-        grid: '#161b22',
-        gridMajor: '#202631',
+        grid: '#0c0e12',
+        gridMajor: '#1a1f27',
       }
     : {
         ink: '#14171d',
@@ -33,8 +33,8 @@ export function palette(theme: Theme): Palette {
         screen: '#f7f8fa',
         blue: '#2d5bff',
         blueSoft: '#e1e8ff',
-        grid: '#dfe2e8',
-        gridMajor: '#c9ced7',
+        grid: '#f4f5f7',
+        gridMajor: '#dde0e6',
       };
 }
 

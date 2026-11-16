@@ -5,9 +5,9 @@
 
 :root {
   color-scheme: light;
-  --bg: #f2f3f5;
-  --bg-2: #e9ebef;
-  --paper: #fbfbfc;
+  --bg: #f4f5f7;
+  --bg-2: #eceef2;
+  --paper: #ffffff;
   --ink: #0f1115;
   --ink-2: #4b5261;
   --ink-3: #616876;
@@ -40,9 +40,9 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #0b0d10;
-  --bg-2: #13161b;
-  --paper: #161a20;
+  --bg: #0c0e12;
+  --bg-2: #14171d;
+  --paper: #15191f;
   --ink: #e9ecf1;
   --ink-2: #a2a9b6;
   --ink-3: #8a919e;
@@ -83,17 +83,6 @@ html.lenis body {
 }
 body {
   background-color: var(--bg);
-  background-image:
-    linear-gradient(var(--grid-major) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size:
-    120px 120px,
-    120px 120px,
-    24px 24px,
-    24px 24px;
-  background-position: -1px -1px;
   color: var(--ink);
   font-family: var(--font);
   font-size: 1.0625rem;
@@ -172,6 +161,21 @@ p {
 }
 .section {
   padding-block: var(--section);
+}
+.skip {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  transform: translateY(-160%);
+  transition: transform 0.3s var(--ease);
+}
+.skip:focus {
+  transform: none;
 }
 .sr-only {
   position: absolute !important;

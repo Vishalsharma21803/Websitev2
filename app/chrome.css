@@ -2,36 +2,23 @@
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--ls) * 0.3);
-  line-height: 1;
+  line-height: 0;
+  color: #34374a;
 }
-.logo-mark {
-  width: var(--ls);
-  height: var(--ls);
-  flex: none;
+:root[data-theme='dark'] .logo {
+  color: #e9ecf1;
+}
+.logo-svg {
+  display: block;
+  overflow: visible;
+}
+.logo-mark-g {
+  transform-box: fill-box;
+  transform-origin: center;
   transition: transform 0.9s var(--ease);
 }
-.logo-mark .lg-d {
-  fill: var(--logo-d, #36364a);
-}
-.logo-mark .lg-l {
-  fill: var(--logo-l, #626274);
-}
-:root[data-theme='dark'] .logo-mark .lg-d {
-  fill: #e4e3ec;
-}
-:root[data-theme='dark'] .logo-mark .lg-l {
-  fill: #a3a3b6;
-}
-a:hover > .logo .logo-mark {
-  transform: rotate(-16deg);
-}
-.logo-word {
-  font-size: calc(var(--ls) * 0.8);
-  font-weight: 620;
-  font-stretch: 108%;
-  letter-spacing: -0.05em;
-  padding-bottom: 0.06em;
+a:hover > .logo .logo-mark-g {
+  transform: rotate(-14deg);
 }
 
 /* ---------- theme toggle ---------- */
@@ -82,13 +69,42 @@ a:hover > .logo .logo-mark {
 .top > * {
   pointer-events: auto;
 }
+/* Soft scrim so content never reads through the header. */
+.top::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -1.6rem;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(var(--bg) 45%, color-mix(in oklab, var(--bg) 0%, transparent));
+  opacity: 0.94;
+  transition: opacity 0.4s var(--ease);
+}
+.top.on-stage::before {
+  opacity: 0;
+}
+.top.on-dark::before {
+  opacity: 0;
+}
+.top.on-dark .logo {
+  color: #f2f3f5;
+}
+.top.on-dark .theme {
+  color: var(--on-island);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+.top.on-dark .top-cta {
+  background: var(--on-island);
+  color: var(--island);
+}
+.top-logo-mark {
+  display: none;
+}
 .top-logo {
   justify-self: start;
   margin-top: 0.3rem;
-  padding: 0.25rem 0.6rem 0.25rem 0.25rem;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--bg) 78%, transparent);
-  backdrop-filter: blur(10px);
+  padding: 0.35rem 0;
 }
 .top-right {
   justify-self: end;
@@ -286,11 +302,14 @@ a:hover > .logo .logo-mark {
     grid-template-columns: auto 1fr auto;
     gap: 0.5rem;
   }
-  .top-logo .logo-word {
+  .top-logo-full {
     display: none;
   }
+  .top-logo-mark {
+    display: inline-flex;
+  }
   .top-logo {
-    padding: 0.25rem;
+    padding: 0.35rem 0;
   }
   .top-cta {
     display: none;
@@ -320,16 +339,22 @@ a:hover > .logo .logo-mark {
   gap: 2.5rem clamp(1.5rem, 3vw, 3rem);
 }
 .foot-brand p {
-  margin-top: 1.1rem;
+  margin-top: 0;
   max-width: 34ch;
   color: var(--ink-2);
   font-size: 0.95rem;
 }
+.foot-lead {
+  font-size: 1.15rem !important;
+  color: var(--ink) !important;
+  max-width: 28ch !important;
+  line-height: 1.4;
+}
 .foot-clock {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 1.4rem;
+  margin-top: 1.4rem !important;
 }
 .foot-col h2 {
   font-family: var(--mono);
@@ -356,18 +381,17 @@ a:hover > .logo .logo-mark {
   font-size: 0.92rem;
   display: grid;
 }
-.foot-mega {
-  margin-top: clamp(3rem, 7vw, 5rem);
-  font-size: clamp(4.5rem, 19vw, 17rem);
-  font-weight: 640;
-  font-stretch: 118%;
-  letter-spacing: -0.06em;
-  line-height: 0.8;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--line-2);
+.foot-mark {
+  position: relative;
+  margin-top: clamp(3.5rem, 8vw, 6rem);
   user-select: none;
-  white-space: nowrap;
-  overflow: hidden;
+}
+.foot-mark .logo {
+  width: 100%;
+}
+.foot-mark .logo-svg {
+  width: 100% !important;
+  height: auto !important;
 }
 .foot-legal {
   display: flex;
@@ -398,6 +422,28 @@ a:hover > .logo .logo-mark {
   height: 2px;
   z-index: 70;
   background: var(--blue);
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--blue) 30%, transparent);
   pointer-events: none;
+  opacity: 0;
+  animation: scan 0.85s var(--ease-io) both;
+}
+@keyframes scan {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh);
+  }
+}
+.page-in {
+  animation: page-in 0.45s var(--ease) both;
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
 }

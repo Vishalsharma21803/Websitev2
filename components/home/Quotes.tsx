@@ -1,6 +1,6 @@
 'use client';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { testimonials } from '@/lib/approach';
 import { Arrow } from '../Arrow';
 import { SplitHeading } from '../SplitHeading';
@@ -46,9 +46,9 @@ export function Quotes() {
             >
               <blockquote>
                 <p aria-label={t.text}>
-                  {`“${t.text}”`.split(' ').map((w, k) => (
+                  {`“${t.text}”`.split(' ').map((w, k, arr) => (
+                    <Fragment key={k}>
                     <motion.span
-                      key={k}
                       aria-hidden="true"
                       className="q-word"
                       initial={{ opacity: 0, y: 14, filter: 'blur(4px)' }}
@@ -57,6 +57,8 @@ export function Quotes() {
                     >
                       {w}
                     </motion.span>
+                    {k < arr.length - 1 ? ' ' : null}
+                    </Fragment>
                   ))}
                 </p>
               </blockquote>

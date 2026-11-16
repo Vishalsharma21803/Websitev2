@@ -110,11 +110,12 @@ export const practices: Practice[] = [
 export const practiceBySlug = (slug: string) => practices.find((p) => p.slug === slug);
 
 /** The four deliverables the home assembly draws, in camera order. */
-export const deliverables: { key: DeliverableKey; slug: string; title: string; caption: string; specs: string[] }[] = [
+export const deliverables: { key: DeliverableKey; slug: string; title: string; cta: string; caption: string; specs: string[] }[] = [
   {
     key: 'web',
     slug: 'web',
     title: 'Websites & web platforms',
+    cta: 'Explore web platforms',
     caption: 'Portals, SaaS products and internal tools, engineered for real traffic.',
     specs: ['React · Vue · Angular', 'Node.js · Python', 'APIs · integrations', 'Docker · AWS'],
   },
@@ -122,6 +123,7 @@ export const deliverables: { key: DeliverableKey; slug: string; title: string; c
     key: 'mobile',
     slug: 'mobile',
     title: 'Mobile apps',
+    cta: 'Explore mobile apps',
     caption: 'iOS and Android apps that launch on both stores at once.',
     specs: ['iOS · Android', 'React Native · Ionic', 'Persistent alerts', 'App Store · Play'],
   },
@@ -129,6 +131,7 @@ export const deliverables: { key: DeliverableKey; slug: string; title: string; c
     key: 'agent',
     slug: 'ai-agents',
     title: 'AI agents',
+    cta: 'Explore AI agents',
     caption: 'Agents that answer, qualify and act, with human sign-off built in.',
     specs: ['GPT-4o · RAG', 'Tool calls', 'Guardrails', 'Human review'],
   },
@@ -136,6 +139,7 @@ export const deliverables: { key: DeliverableKey; slug: string; title: string; c
     key: 'flow',
     slug: 'automation',
     title: 'AI automation',
+    cta: 'Explore AI automation',
     caption: 'From inbox to system of record, without the copy-paste in between.',
     specs: ['Ingest · OCR', 'GPT parsing', 'Route · approve', 'Sync · audit'],
   },

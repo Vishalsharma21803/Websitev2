@@ -1,6 +1,6 @@
 'use client';
 import { motion } from 'motion/react';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 
 type Part = string | { live: string };
 
@@ -31,7 +31,8 @@ export function SplitHeading({
   return (
     <Tag id={id} className={`split ${className}`} aria-label={label} initial="hidden" whileInView="show" viewport={{ once: true, margin: '0px 0px -12% 0px' }}>
       {words.map((x, i) => (
-        <span className="split-mask" key={i} aria-hidden="true">
+        <Fragment key={i}>
+        <span className="split-mask" aria-hidden="true">
           <motion.span
             className={x.live ? 'live' : undefined}
             variants={{ hidden: { y: '108%' }, show: { y: '0%' } }}
@@ -40,6 +41,8 @@ export function SplitHeading({
             {x.w}
           </motion.span>
         </span>
+        {i < words.length - 1 ? ' ' : null}
+        </Fragment>
       ))}
     </Tag>
   );

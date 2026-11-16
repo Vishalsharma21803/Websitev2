@@ -6,6 +6,9 @@ import { Reveal } from '@/components/Reveal';
 import { Arrow } from '@/components/Arrow';
 import { CaseDrawing } from '@/components/home/CaseDrawing';
 import { Start } from '@/components/home/Start';
+import { CaseChapter } from '@/components/CaseChapter';
+import { Pipeline } from '@/components/Pipeline';
+import { CountUp } from '@/components/CountUp';
 import { cases, caseBySlug } from '@/lib/work';
 
 export const dynamicParams = false;
@@ -54,34 +57,27 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         <ul className="cs-metrics">
           {c.metrics.map((m, i) => (
             <Reveal as="li" key={m.label} delay={i * 0.06}>
-              <span className="num">{m.value}</span>
+              <CountUp className="num" value={m.value} />
               {m.label}
             </Reveal>
           ))}
         </ul>
       </PageHead>
 
-      <Chapter k="The challenge" title={c.challengeTitle}>
+      <CaseChapter k="The challenge" title={c.challengeTitle}>
         <p className="muted cs-p">{c.problem}</p>
         <ul className="cs-ticks">
-          {c.challenge.map((x) => (
-            <li key={x}>{x}</li>
+          {c.challenge.map((x, i) => (
+            <Reveal as="li" key={x} delay={(i % 6) * 0.04}>
+              {x}
+            </Reveal>
           ))}
         </ul>
-      </Chapter>
+      </CaseChapter>
 
-      <Chapter k="What we built" title={c.solutionTitle}>
+      <CaseChapter k="What we built" title={c.solutionTitle}>
         <p className="muted cs-p">{c.solution}</p>
-        {c.steps && (
-          <ol className="cs-steps" aria-label="Pipeline">
-            {c.steps.map((s, i) => (
-              <li key={s}>
-                <span className="mono num">{i + 1}</span>
-                {s}
-              </li>
-            ))}
-          </ol>
-        )}
+        {c.steps && <Pipeline steps={c.steps} />}
         <div className="cs-feats">
           {c.features.map((f) => (
             <Reveal key={f.title} className="cs-feat">
@@ -102,12 +98,14 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
             </ul>
           </div>
         )}
-      </Chapter>
+      </CaseChapter>
 
-      <Chapter k="The outcome" title={c.outcomeTitle}>
+      <CaseChapter k="The outcome" title={c.outcomeTitle}>
         <ul className="cs-ticks cs-ticks--done">
-          {c.outcome.map((x) => (
-            <li key={x}>{x}</li>
+          {c.outcome.map((x, i) => (
+            <Reveal as="li" key={x} delay={i * 0.08}>
+              {x}
+            </Reveal>
           ))}
         </ul>
         {c.quote && (
@@ -120,7 +118,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
             </figcaption>
           </figure>
         )}
-      </Chapter>
+      </CaseChapter>
 
       <div className="wrap">
         <Link href={`/work/${next.slug}/`} className="cs-next sheet">
@@ -132,19 +130,5 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
       </div>
       <Start />
     </>
-  );
-}
-
-function Chapter({ k, title, children }: { k: string; title: string; children: React.ReactNode }) {
-  return (
-    <section className="cs-ch wrap">
-      <h2 className="mono cs-k">{k}</h2>
-      <div className="cs-body">
-        <Reveal>
-          <p className="cs-lede">{title}</p>
-        </Reveal>
-        {children}
-      </div>
-    </section>
   );
 }

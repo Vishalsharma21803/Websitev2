@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <a className="sr-only" href="#main">
+        <a className="skip" href="#main">
           Skip to content
         </a>
         <SmoothScroll />

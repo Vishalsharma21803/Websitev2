@@ -25,7 +25,7 @@ export function Marquee() {
     <section className="mq" aria-label="Clients and industries">
       <div className="wrap mq-head">
         <p className="mq-title">Built for teams at</p>
-        <p className="mono mq-ind">{industries.join(' · ')}</p>
+        <p className="mono mq-ind">{industries.join('\u00a0· ')}</p>
       </div>
       <div className="mq-track-wrap">
         <motion.ul className="mq-track" style={{ x }}>

@@ -10,6 +10,7 @@ import { TrustLine } from '@/components/home/TrustLine';
 import { Start } from '@/components/home/Start';
 import { practices, practiceBySlug } from '@/lib/services';
 import { caseBySlug } from '@/lib/work';
+import { CaseDrawing } from '@/components/home/CaseDrawing';
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -97,6 +98,9 @@ export default async function Practice({ params }: { params: Promise<{ slug: str
               {related.map((c, i) => (
                 <Reveal key={c.slug} delay={i * 0.06}>
                   <Link href={`/work/${c.slug}/`} className="rel-card sheet">
+                    <span className="rel-art" aria-hidden="true">
+                      <CaseDrawing slug={c.slug} />
+                    </span>
                     <span className="mono">{c.client}</span>
                     <span className="rel-t">{c.title}</span>
                     <span className="rel-shift">
