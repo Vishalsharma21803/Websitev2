@@ -71,14 +71,15 @@ export function useObjMats(pal: Palette): ObjMats {
 export function useObjPhase(mats: ObjMats, index: number, delay: number) {
   const tmp = useMemo(() => new THREE.Color(), []);
   useFrame(() => {
-    const d = clamp01((phase.draw - delay) / 0.62);
-    const eased = 1 - Math.pow(1 - d, 3);
+    const d = clamp01((phase.draw - delay) / 0.55);
+    const eased = d < 0.5 ? 4 * d * d * d : 1 - Math.pow(-2 * d + 2, 3) / 2;
     const dim = phase.focus >= 0 && phase.focus !== index ? phase.focusMix : 0;
     const vis = 1 - 0.78 * dim;
     mats.line.dashSize = eased * 1.001;
     tmp.copy(mats.ink).lerp(mats.blue, phase.run * 0.9);
     mats.line.color.copy(tmp);
-    mats.line.opacity = (1 - phase.fill * 0.25) * vis;
+    // Lines fade up as they grow, so the first frames read as faint construction lines, not specks.
+    mats.line.opacity = (1 - phase.fill * 0.25) * vis * Math.min(1, eased * 1.6);
     mats.fill.opacity = phase.fill * 0.97 * vis;
     mats.screen.forEach((s) => (s.opacity = phase.fill * vis));
   });
@@ -118,13 +119,12 @@ export function Drawn({
 
 export const box = (w: number, h: number, d: number) => new THREE.BoxGeometry(w, h, d);
 
-/** Line distances accumulate across every edge; scale them to 0..1 so each part draws fully at dashSize 1. */
+/** Give every edge its own 0..1 distance so all edges of a part grow together as dashSize rises. */
 function normaliseDistances(g: LineSegmentsGeometry) {
   const attr = g.attributes.instanceDistanceStart as THREE.InterleavedBufferAttribute | undefined;
   if (!attr) return;
   const arr = attr.data.array as Float32Array;
-  const total = arr[arr.length - 1] || 1;
-  for (let i = 0; i < arr.length; i++) arr[i] /= total;
+  for (let i = 0; i < arr.length; i++) arr[i] = i % 2 === 0 ? 0 : 1;
   attr.data.needsUpdate = true;
 }
 
@@ -186,7 +186,7 @@ export function Screen({
   useFrame(() => {
     const s = state.current;
     const runStep = Math.round(phase.run * 10);
-    const tick = phase.run > 0.5 && phase.time - s.last > 0.05;
+    const tick = phase.run > 0.5 && Math.abs(phase.time - s.last) > 0.033;
     if (tick || runStep !== s.run) {
       s.last = phase.time;
       s.run = runStep;
@@ -251,7 +251,7 @@ export function Anno({
   useFrame(() => {
     const inFocus = phase.focus === index ? phase.focusMix : 0;
     const focusVis = detail ? inFocus : phase.focus < 0 ? 1 : phase.focus === index ? 1 : 1 - phase.focusMix;
-    const o = phase.annotate * focusVis;
+    const o = (strong ? Math.max(phase.figs, phase.annotate) : phase.annotate) * focusVis;
     (line.material as LineMaterial).opacity = o * 0.9;
     if (label.current) {
       label.current.style.opacity = String(o);

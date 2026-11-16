@@ -7,6 +7,7 @@ import { scene, setStatus } from '@/lib/store';
 import { deliverables, practices } from '@/lib/services';
 import { Arrow } from '../Arrow';
 import { BlueprintPoster } from './BlueprintPoster';
+import { HeroSheet } from './HeroSheet';
 
 const AssemblyCanvas = dynamic(() => import('../three/Scene'), { ssr: false });
 
@@ -63,10 +64,16 @@ export function Assembly() {
       const p = Math.min(1, Math.max(0, -r.top / span));
       scene.progress = p;
       const s = stageFor(p);
-      if (s !== last) {
-        last = s;
-        setStage(s);
-        setStatus({ label: STAGES[s].label, live: STAGES[s].live, step: s + 1, steps: STAGES.length });
+      const inside = r.bottom > window.innerHeight * 0.35;
+      const key = inside ? s : -1;
+      if (key !== last) {
+        last = key;
+        if (inside) {
+          setStage(s);
+          setStatus({ label: STAGES[s].label, live: STAGES[s].live, step: s + 1, steps: STAGES.length });
+        } else {
+          setStatus({ label: '', live: false, step: 0, steps: 0 });
+        }
       }
       raf = requestAnimationFrame(tick);
     };
@@ -93,12 +100,13 @@ export function Assembly() {
           {webgl ? <AssemblyCanvas active={active} reduced={reduced} /> : <BlueprintPoster />}
         </div>
 
+        <HeroSheet show={stage === 0} />
         <div className="asm-overlay wrap">
           {/* Hero */}
           <motion.div
             className="asm-hero"
-            animate={{ opacity: stage === 0 ? 1 : 0, y: stage === 0 ? 0 : -30, filter: stage === 0 ? 'blur(0px)' : 'blur(8px)' }}
-            transition={{ duration: 0.7, ease }}
+            animate={{ opacity: stage === 0 ? 1 : 0, y: stage === 0 ? 0 : -40, filter: stage === 0 ? 'blur(0px)' : 'blur(6px)' }}
+            transition={{ duration: 0.9, ease }}
             aria-hidden={stage !== 0}
             style={{ pointerEvents: stage === 0 ? 'auto' : 'none' }}
           >
@@ -135,21 +143,22 @@ export function Assembly() {
 
           {/* Chapters */}
           <div className="asm-chapters" aria-hidden={chapter < 0}>
-            <AnimatePresence mode="wait">
+            <div className="asm-chapter-box">
+            <AnimatePresence>
               {chapter > 0 && (
                 <motion.div
                   key={chapter}
                   className="asm-chapter"
-                  initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, y: -24, filter: 'blur(8px)' }}
-                  transition={{ duration: 0.6, ease }}
+                  initial={{ opacity: 0, y: 40, filter: 'blur(6px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease, delay: 0.12 } }}
+                  exit={{ opacity: 0, y: -40, filter: 'blur(6px)', transition: { duration: 0.5, ease } }}
                 >
                   <p className={`asm-word ${chapter === 3 ? 'is-live' : ''}`}>{CHAPTERS[chapter].word}.</p>
                   <p className="asm-line">{CHAPTERS[chapter].line}</p>
                 </motion.div>
               )}
             </AnimatePresence>
+            </div>
             <ol className={`asm-legend mono ${chapter > 0 ? 'is-on' : ''}`}>
               {CHAPTERS.map((c, i) => (
                 <li key={c.word} className={i < chapter ? 'done' : i === chapter ? 'now' : ''}>
@@ -161,15 +170,14 @@ export function Assembly() {
           </div>
 
           {/* Deliverables */}
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             {d && prac && (
               <motion.article
                 key={d.key}
                 className="asm-focus sheet"
-                initial={{ opacity: 0, x: -30, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, x: -20, filter: 'blur(8px)' }}
-                transition={{ duration: 0.6, ease }}
+                initial={{ opacity: 0, y: 36, scale: 0.97, filter: 'blur(6px)' }}
+                animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 0.85, ease, delay: 0.15 } }}
+                exit={{ opacity: 0, y: -28, scale: 0.98, filter: 'blur(6px)', transition: { duration: 0.45, ease } }}
               >
                 <span className="ticks" aria-hidden="true" />
                 <p className="mono asm-fig">

@@ -1,31 +1,33 @@
 'use client';
 import Link from 'next/link';
-import { LayoutGroup, motion } from 'motion/react';
-import { useState } from 'react';
+import { LayoutGroup, motion, useInView, useScroll, useTransform, type MotionValue } from 'motion/react';
+import { useRef, useState } from 'react';
 import { cases } from '@/lib/work';
 import { Arrow } from '../Arrow';
 import { Reveal } from '../Reveal';
 import { CaseDrawing } from './CaseDrawing';
+import { SplitHeading } from '../SplitHeading';
+import { CountUp } from '../CountUp';
 
 export function Outcomes({ heading = 'Outcomes first. Engineering underneath.' }: { heading?: string }) {
+  const list = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: list, offset: ['start 15%', 'end end'] });
   return (
     <section className="outcomes section" aria-labelledby="out-h">
       <div className="wrap">
         <div className="sec-head">
-          <Reveal>
-            <h2 id="out-h" className="h2">
-              {heading}
-            </h2>
-          </Reveal>
+          <SplitHeading id="out-h" parts={[heading]} />
           <Reveal delay={0.1}>
             <p className="lead">Every case reads two ways. Switch any card to see what a business owner cares about, or what an engineer would ask.</p>
           </Reveal>
         </div>
-        <div className="oc-list">
+        <div className="oc-list" ref={list}>
           {cases.map((c, i) => (
-            <Reveal key={c.slug} delay={i * 0.05}>
-              <OutcomeCard c={c} i={i} />
-            </Reveal>
+            <div className="oc-slot" key={c.slug} style={{ ['--k' as string]: i }}>
+              <StackScale p={scrollYProgress} i={i} n={cases.length}>
+                <OutcomeCard c={c} i={i} />
+              </StackScale>
+            </div>
           ))}
         </div>
       </div>
@@ -33,10 +35,24 @@ export function Outcomes({ heading = 'Outcomes first. Engineering underneath.' }
   );
 }
 
+/** Earlier cards ease back as later ones stack over them. */
+function StackScale({ p, i, n, children }: { p: MotionValue<number>; i: number; n: number; children: React.ReactNode }) {
+  const start = i / n;
+  const scale = useTransform(p, [start, 1], [1, 1 - (n - 1 - i) * 0.045]);
+  const y = useTransform(p, [start, 1], [0, -(n - 1 - i) * 10]);
+  return (
+    <motion.div style={{ scale, y, transformOrigin: '50% 0%' }} initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}>
+      {children}
+    </motion.div>
+  );
+}
+
 function OutcomeCard({ c, i }: { c: (typeof cases)[number]; i: number }) {
   const [view, setView] = useState<'biz' | 'eng'>('biz');
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: '0px 0px -25% 0px' });
   return (
-    <article className="oc sheet">
+    <article ref={ref} className={`oc sheet ${inView ? 'is-in' : ''}`}>
       <span className="ticks" aria-hidden="true" />
       <div className="oc-art">
         <CaseDrawing slug={c.slug} />
@@ -71,7 +87,7 @@ function OutcomeCard({ c, i }: { c: (typeof cases)[number]; i: number }) {
             <ul className="oc-metrics">
               {c.metrics.map((m) => (
                 <li key={m.label}>
-                  <span className="num">{m.value}</span>
+                  <CountUp className="num" value={m.value} />
                   {m.label}
                 </li>
               ))}

@@ -47,6 +47,9 @@ export const phase = {
   focus: -1, // index of focused deliverable, -1 = overview
   focusMix: 0, // 0..1 blend into focus framing
   time: 0,
+  p: 0, // eased scroll progress (follows scene.progress)
+  intro: 0, // 0..1 opening sequence
+  figs: 0, // figure labels (shown from the hero onward)
 };
 
 export const clamp01 = (v: number) => Math.min(1, Math.max(0, v));

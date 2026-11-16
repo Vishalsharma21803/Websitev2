@@ -3,6 +3,7 @@ import { motion, useScroll, useSpring, useTransform } from 'motion/react';
 import { useRef } from 'react';
 import { productionLayer } from '@/lib/approach';
 import { Reveal } from '../Reveal';
+import { SplitHeading } from '../SplitHeading';
 
 /** The Sifars Production Layer as a technical drawing: six callouts draw in as you scroll. */
 export function Schematic() {
@@ -15,11 +16,7 @@ export function Schematic() {
     <section ref={ref} className="schem section" aria-labelledby="schem-h">
       <div className="wrap">
         <div className="sec-head">
-          <Reveal>
-            <h2 id="schem-h" className="h2">
-              Production-ready means more than “it works in a demo.”
-            </h2>
-          </Reveal>
+          <SplitHeading id="schem-h" parts={['Production-ready means more than', { live: '“it works in a demo.”' }]} />
           <Reveal delay={0.1}>
             <p className="lead">The Sifars Production Layer covers the six parts that usually break later, mapped before the build starts.</p>
           </Reveal>

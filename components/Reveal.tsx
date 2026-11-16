@@ -9,7 +9,7 @@ export function Reveal({ delay = 0, children, as = 'div', ...rest }: Props) {
   const M = as === 'li' ? motion.li : as === 'section' ? motion.section : motion.div;
   return (
     <M
-      initial={{ opacity: 0, y: 26, filter: 'blur(8px)' }}
+      initial={{ opacity: 0, y: 26, filter: 'blur(4px)' }}
       whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
       transition={{ duration: 1, delay, ease: [0.16, 1, 0.3, 1] }}

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { testimonials } from '@/lib/approach';
 import { Arrow } from '../Arrow';
+import { SplitHeading } from '../SplitHeading';
 
 export function Quotes() {
   const [i, setI] = useState(0);
@@ -18,9 +19,7 @@ export function Quotes() {
     <section className="quotes section" aria-labelledby="q-h" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       <div className="wrap q-grid">
         <div>
-          <h2 id="q-h" className="h2">
-            Great work speaks for itself
-          </h2>
+          <SplitHeading id="q-h" parts={['Great work speaks for itself']} />
           <div className="q-ctrl">
             <button type="button" className="q-btn" onClick={() => setI((i - 1 + n) % n)} aria-label="Previous testimonial">
               <Arrow dir="left" />
@@ -46,7 +45,20 @@ export function Quotes() {
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
               <blockquote>
-                <p>“{t.text}”</p>
+                <p aria-label={t.text}>
+                  {`“${t.text}”`.split(' ').map((w, k) => (
+                    <motion.span
+                      key={k}
+                      aria-hidden="true"
+                      className="q-word"
+                      initial={{ opacity: 0, y: 14, filter: 'blur(4px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      transition={{ duration: 0.6, delay: 0.1 + k * 0.035, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      {w}
+                    </motion.span>
+                  ))}
+                </p>
               </blockquote>
               <figcaption>
                 <span className="q-mono" aria-hidden="true">

@@ -19,21 +19,45 @@ const LAYOUT = [
 /* Reads scroll + intro time, writes the shared phase values. */
 function Director({ reduced }: { reduced: boolean }) {
   const t0 = useRef(0);
-  useFrame((_, dt) => {
+  useEffect(() => {
+    phase.p = reduced ? 0.4 : scene.progress;
+  }, [reduced]);
+  useFrame((state, dt) => {
     const d = Math.min(dt, 0.05);
-    t0.current += d;
-    const p = reduced ? 0.4 : scene.progress;
-    const intro = reduced ? 1 : Math.min(1, t0.current / 3.1);
-    phase.draw = Math.max(intro, smooth(0, 0.06, p));
-    phase.annotate = reduced ? 1 : smooth(0.09, 0.16, p);
-    phase.fill = reduced ? 1 : smooth(0.2, 0.29, p);
-    phase.run = reduced ? 1 : smooth(0.32, 0.4, p);
+    // Opening sequence runs on wall-clock time so slow devices still finish it on schedule.
+    t0.current = state.clock.elapsedTime;
+    // Ease toward the scroll position so every phase glides rather than tracks raw input.
+    const target = reduced ? 0.4 : scene.progress;
+    phase.p += (target - phase.p) * (1 - Math.exp(-d * 7));
+    const p = phase.p;
+    phase.intro = reduced ? 1 : smooth(0, 2.4, t0.current);
+    phase.draw = Math.max(phase.intro, smooth(0, 0.06, p));
+    phase.figs = reduced ? 1 : smooth(2.0, 2.9, t0.current);
+    phase.annotate = reduced ? 1 : smooth(0.085, 0.17, p);
+    // A faint pencil fill appears once drawn, so the opening frame already reads as objects.
+    const ghost = 0.16 * smooth(1.6, 2.8, t0.current);
+    phase.fill = reduced ? 1 : Math.max(ghost, smooth(0.19, 0.3, p));
+    phase.run = reduced ? 1 : smooth(0.31, 0.41, p);
     const seg = (p - 0.44) / 0.56;
-    phase.focusMix = reduced ? 0 : smooth(0.44, 0.49, p);
-    phase.focus = seg >= 0 && !reduced ? Math.min(3, Math.floor(seg * 4)) : -1;
-    if (!reduced) phase.time += d * (0.25 + 0.75 * phase.run);
+    phase.focusMix = reduced ? 0 : smooth(0.435, 0.5, p);
+    phase.focus = seg >= -0.02 && !reduced ? Math.min(3, Math.max(0, Math.floor(seg * 4))) : -1;
+    if (!reduced) phase.time += d * (0.3 + 0.7 * phase.run);
   }, -1);
   return null;
+}
+
+/* Objects rise a little as they are drawn. */
+function Rise({ delay, children }: { delay: number; children: React.ReactNode }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame(() => {
+    if (!ref.current) return;
+    const d = Math.min(1, Math.max(0, (phase.draw - delay) / 0.6));
+    const e = 1 - Math.pow(1 - d, 3);
+    ref.current.position.y = (1 - e) * -0.35;
+    const s = 0.94 + 0.06 * e;
+    ref.current.scale.setScalar(s);
+  });
+  return <group ref={ref}>{children}</group>;
 }
 
 /* Camera: slow orbit through the chapters, then fly to each deliverable. */
@@ -47,12 +71,28 @@ function Rig({ reduced }: { reduced: boolean }) {
   const shift = useRef(0.2);
   const yLift = useRef(0);
 
+  const pointer = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      pointer.current.tx = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.current.ty = (e.clientY / window.innerHeight) * 2 - 1;
+    };
+    window.addEventListener('pointermove', move, { passive: true });
+    return () => window.removeEventListener('pointermove', move);
+  }, []);
+
   useFrame((_, dt) => {
-    const p = reduced ? 0.4 : scene.progress;
+    const p = phase.p;
     const narrow = size.width / size.height < 0.85;
-    const radius = narrow ? 15 : 11.2;
-    const az = 0.42 - Math.min(p, 0.44) * 1.25;
-    const height = (narrow ? 5.4 : 4.1) - Math.min(p, 0.44) * 1.2;
+    const ptr = pointer.current;
+    const kp = 1 - Math.exp(-Math.min(dt, 0.05) * 2.5);
+    ptr.x += (ptr.tx - ptr.x) * kp;
+    ptr.y += (ptr.ty - ptr.y) * kp;
+    const open = 1 - phase.intro; // camera dollies in during the opening sequence
+    const heroClose = 1 - smooth(0.02, 0.12, p);
+    const radius = (narrow ? 15 : 11.2 - heroClose * 0.5) + open * 1.6;
+    const az = 0.42 - Math.min(p, 0.44) * 1.25 + open * 0.22 + (reduced ? 0 : ptr.x * 0.05);
+    const height = (narrow ? 5.4 : 4.1) - Math.min(p, 0.44) * 1.2 + open * 0.9 - (reduced ? 0 : ptr.y * 0.25);
     tmpLook.set(0.05, 0.55, 0.45);
     tmpPos.set(Math.sin(az) * radius + tmpLook.x, height, Math.cos(az) * radius + tmpLook.z);
 
@@ -70,13 +110,13 @@ function Rig({ reduced }: { reduced: boolean }) {
       tmpLook.lerp(focusLook, phase.focusMix);
     }
 
-    const k = 1 - Math.exp(-dt * 3.2);
+    const k = 1 - Math.exp(-Math.min(dt, 0.05) * 2.6);
     camera.position.lerp(tmpPos, k);
     look.current.lerp(tmpLook, k);
     camera.lookAt(look.current);
 
     // Shift the drawing away from the copy column.
-    const target = narrow ? 0 : p < 0.09 ? 0.19 : phase.focus >= 0 ? 0.22 : 0.03;
+    const target = narrow ? 0 : p < 0.09 ? 0.215 : phase.focus >= 0 ? 0.22 : 0.03;
     shift.current += (target - shift.current) * k;
     const cam = camera as THREE.PerspectiveCamera;
     const chapterLift = p >= 0.09 && phase.focus < 0 ? 0.1 : 0;
@@ -125,7 +165,9 @@ function World({ reduced }: { reduced: boolean }) {
         const Obj = [WebPlatform, MobileApp, Agent, Flow][i];
         return (
           <group key={i} position={L.pos} rotation={[0, L.rotY, 0]}>
-            <Obj pal={pal} index={i} delay={i * 0.12} />
+            <Rise delay={i * 0.11}>
+              <Obj pal={pal} index={i} delay={i * 0.11} />
+            </Rise>
           </group>
         );
       })}
@@ -138,8 +180,8 @@ export default function AssemblyCanvas({ active, reduced }: { active: boolean; r
     <Canvas
       className="assembly-canvas"
       frameloop={active ? 'always' : 'never'}
-      dpr={[1, 1.75]}
-      camera={{ fov: 30, near: 0.1, far: 80, position: [4, 4.2, 9.6] }}
+      dpr={[1, 1.6]}
+      camera={{ fov: 30, near: 0.1, far: 80, position: [6, 5.6, 11.5] }}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       flat
       aria-hidden="true"
@@ -164,7 +206,9 @@ function SoloDirector() {
     phase.run = smooth(3.6, 4.4, s);
     phase.focus = -1;
     phase.focusMix = 0;
-    phase.time += Math.min(dt, 0.05) * (0.25 + 0.75 * phase.run);
+    phase.figs = phase.annotate;
+    phase.intro = 1;
+    phase.time += Math.min(dt, 0.05) * (0.3 + 0.7 * phase.run);
   }, -1);
   return null;
 }
