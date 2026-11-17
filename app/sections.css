@@ -627,305 +627,6 @@
   }
 }
 
-/* ============================== schematic ============================== */
-.schem {
-  padding-top: var(--section);
-}
-.schem-scroll.is-pinned {
-  height: 340vh;
-}
-.schem-scroll.is-pinned .schem-stick {
-  position: sticky;
-  top: 0;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding-block: 5.5rem 2rem;
-}
-.schem-scroll.is-pinned .schem-stick > .wrap {
-  width: 100%;
-}
-.schem-scroll:not(.is-pinned) {
-  padding-bottom: var(--section);
-}
-.schem-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr) minmax(0, 1fr);
-  gap: clamp(1.5rem, 3vw, 3rem);
-  align-items: center;
-}
-.schem-col {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  gap: clamp(0.6rem, 1.4vw, 1rem);
-}
-.callout-btn {
-  position: relative;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 2.6rem minmax(0, 1fr);
-  gap: 0.6rem;
-  padding: 1rem 1rem 1.1rem;
-  text-align: left;
-  border-radius: var(--r-sm);
-  transition:
-    background-color 0.6s var(--ease),
-    opacity 0.6s var(--ease),
-    transform 0.7s var(--ease),
-    box-shadow 0.6s var(--ease);
-}
-.callout-t {
-  display: block;
-  font-size: 1.22rem;
-  font-weight: 560;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.25rem;
-}
-.callout-b {
-  display: block;
-  font-size: 0.94rem;
-  color: var(--ink-2);
-}
-.callout-n {
-  padding-top: 0.3rem;
-  color: var(--ink-3);
-  transition: color 0.4s;
-}
-.callout-lead {
-  position: absolute;
-  left: 1rem;
-  right: 1rem;
-  bottom: 0;
-  height: 1px;
-  background: var(--line);
-  overflow: hidden;
-}
-.callout-lead::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--ink);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.9s var(--ease);
-}
-.schem-col--r .callout-lead::after {
-  transform-origin: right;
-}
-.callout.is-next .callout-btn {
-  opacity: 0.62;
-}
-.callout.is-done .callout-lead::after {
-  transform: none;
-}
-.callout.is-now .callout-btn {
-  background: var(--paper);
-  box-shadow:
-    inset 0 0 0 1px var(--line),
-    var(--shadow);
-  transform: translateX(6px);
-}
-.schem-col--r .callout.is-now .callout-btn {
-  transform: translateX(-6px);
-}
-.callout.is-now .callout-n {
-  color: var(--blue-ink);
-}
-.callout.is-now .callout-lead::after {
-  transform: none;
-  background: var(--blue);
-}
-.callout-btn:hover {
-  opacity: 1 !important;
-}
-.schem-core {
-  position: relative;
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-}
-.schem-core svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.schem-outer {
-  fill: none;
-  stroke: var(--line);
-  stroke-dasharray: 2 6;
-}
-.schem-arc-base {
-  fill: none;
-  stroke: var(--line);
-  stroke-width: 10;
-  stroke-linecap: round;
-}
-.schem-arc {
-  fill: none;
-  stroke: var(--blue);
-  stroke-width: 10;
-  stroke-linecap: round;
-}
-.schem-tick {
-  stroke: var(--line-2);
-  stroke-width: 1.5;
-  transition: stroke 0.5s;
-}
-.schem-tick.on {
-  stroke: var(--blue);
-}
-.schem-hub {
-  fill: var(--paper);
-  stroke: var(--line);
-}
-.schem-center {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-}
-.schem-center-in {
-  display: grid;
-  justify-items: center;
-  gap: 0.35rem;
-  text-align: center;
-  max-width: 9.5rem;
-}
-.schem-center-in .mono {
-  color: var(--blue-ink);
-}
-.schem-center-t {
-  font-size: 1.1rem;
-  font-weight: 580;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-}
-@media (max-width: 1000px) {
-  .schem-grid {
-    grid-template-columns: 1fr;
-  }
-  .schem-core {
-    max-width: 320px;
-    order: -1;
-    justify-self: center;
-    width: 100%;
-  }
-}
-
-/* ============================== phases ============================== */
-.ph-rail {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--line-2);
-  margin-bottom: 1.5rem;
-}
-.ph-fill {
-  position: absolute;
-  top: -1.5px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--blue);
-  transform-origin: left;
-}
-.ph-tab {
-  display: grid;
-  gap: 0.4rem;
-  text-align: left;
-  padding: 1.3rem 1rem 0.4rem 0;
-  color: var(--ink-3);
-  transition: color 0.4s;
-}
-.ph-tab .mono {
-  color: inherit;
-}
-.ph-tab.is-on {
-  color: var(--ink);
-}
-.ph-tab[aria-selected='true'] .mono {
-  color: var(--blue-ink);
-}
-.ph-name {
-  font-size: clamp(1.25rem, 2.2vw, 1.9rem);
-  font-weight: 560;
-  font-stretch: 108%;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
-}
-.ph-panel {
-  padding: clamp(1.5rem, 3vw, 2.6rem);
-  min-height: 15rem;
-}
-.ph-inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: 1.5rem 3rem;
-}
-.ph-tag {
-  font-size: clamp(1.4rem, 2.4vw, 2rem);
-  font-weight: 560;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-}
-.ph-items {
-  list-style: none;
-  padding: 0;
-  columns: 2;
-  column-gap: 2rem;
-}
-.ph-items li {
-  padding-block: 0.55rem;
-  border-bottom: 1px solid var(--line);
-  break-inside: avoid;
-  font-size: 0.98rem;
-}
-.models {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(1rem, 2vw, 1.5rem);
-  margin-top: clamp(3rem, 6vw, 5rem);
-}
-.model {
-  display: grid;
-  gap: 0.8rem;
-  align-content: start;
-  padding-top: 1.3rem;
-  border-top: 1px solid var(--ink);
-}
-.model .mono {
-  color: var(--ink-3);
-}
-.model-meter {
-  display: flex;
-  gap: 4px;
-  margin-top: 0.4rem;
-}
-.model-meter i {
-  transform-origin: left;
-  height: 4px;
-  flex: 1;
-  border-radius: 2px;
-  background: var(--line);
-}
-.model-meter i.on {
-  background: var(--ink);
-}
-@media (max-width: 860px) {
-  .ph-inner,
-  .models {
-    grid-template-columns: 1fr;
-  }
-  .ph-items {
-    columns: 1;
-  }
-  .ph-rail {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ============================== trust ============================== */
 .trust-sheet {
   padding: clamp(1.75rem, 5vw, 4.5rem);
@@ -2642,32 +2343,6 @@
   }
 }
 
-/* ---------- pinned phases ---------- */
-.phases {
-  padding-top: var(--section);
-}
-.ph-scroll.is-pinned {
-  height: 300vh;
-}
-.ph-scroll.is-pinned .ph-stick {
-  position: sticky;
-  top: 0;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding-block: 5.5rem 3rem;
-}
-.ph-scroll.is-pinned .ph-stick > .wrap {
-  width: 100%;
-}
-.ph-count {
-  margin-top: 1rem;
-  color: var(--ink-3);
-}
-.phases .models {
-  padding-bottom: var(--section);
-}
-
 /* ---------- quotes ---------- */
 .q-word {
   display: inline-block;
@@ -2696,10 +2371,7 @@
 
 
 /* ---------- review fixes ---------- */
-.section + .section,
-.section + .phases,
-.phases + .section,
-.schem + .section {
+.section + .section {
   padding-top: calc(var(--section) * 0.55);
 }
 :root[data-theme='dark'] .start-sheet {
@@ -2789,7 +2461,8 @@
   width: 100%;
   height: auto;
   color: var(--ink-2);
-  overflow: visible;
+  /* keep every drawing inside its sheet */
+  overflow: hidden;
 }
 .ds-svg .ds-live {
   stroke: var(--blue);
@@ -3053,4 +2726,462 @@
 .rel-card:hover .cd .cd-hot {
   fill: var(--blue-soft);
   stroke: var(--blue);
+}
+
+
+/* ============================== production layer stack (3D) ============================== */
+.stk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: stretch;
+}
+.stk-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  align-content: center;
+}
+.stk-item {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  gap: 0.5rem;
+  padding: 0.95rem 1rem 1.05rem;
+  text-align: left;
+  border-radius: var(--r-sm);
+  transition:
+    background-color 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+.stk-num {
+  padding-top: 0.2rem;
+  color: var(--ink-3);
+  transition: color 0.4s;
+}
+.stk-title {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  transition: color 0.4s;
+}
+.stk-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  font-size: 0.94rem;
+  color: var(--ink-2);
+  overflow: hidden;
+  transition:
+    grid-template-rows 0.6s var(--ease),
+    margin 0.6s var(--ease),
+    opacity 0.4s;
+  opacity: 0;
+}
+/* The grid row only collapses to 0 when its single child can shrink below its content. */
+.stk-body > span {
+  min-height: 0;
+  overflow: hidden;
+}
+.stk-item.is-on .stk-body {
+  grid-template-rows: 1fr;
+  margin-top: 0.3rem;
+  opacity: 1;
+}
+.stk-item.is-on {
+  background: var(--paper);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    var(--shadow);
+}
+.stk-item.is-on .stk-num,
+.stk-item.is-done .stk-num {
+  color: var(--blue-ink);
+}
+.stk-item:not(.is-on):hover {
+  background: color-mix(in oklab, var(--paper) 60%, transparent);
+}
+.stk-stage {
+  position: relative;
+  min-height: clamp(420px, 62vh, 620px);
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 55%, var(--paper) 0%, var(--bg-2) 100%);
+}
+.stk-canvas {
+  position: absolute !important;
+  inset: 0;
+}
+.stk-loading {
+  position: absolute;
+  inset: 0;
+}
+.stk-cap {
+  position: absolute;
+  left: 1.2rem;
+  bottom: 1rem;
+  color: var(--ink-3);
+  pointer-events: none;
+}
+.stk-n {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  transition: color 0.3s;
+}
+.stk-n.is-on {
+  color: var(--blue-ink);
+  font-weight: 600;
+}
+.stk-tag {
+  display: inline-block;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--on-blue);
+  background: var(--blue);
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+}
+.stk-fallback {
+  position: absolute;
+  inset: 18% 22%;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  gap: 10px;
+}
+.stk-fallback span {
+  height: 22px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  background: var(--paper);
+  transition:
+    transform 0.6s var(--ease),
+    background-color 0.4s;
+}
+.stk-fallback span.is-on {
+  background: var(--blue-soft);
+  box-shadow: inset 0 0 0 1.5px var(--blue);
+  transform: translateX(18px);
+}
+@media (max-width: 960px) {
+  .stk-grid {
+    grid-template-columns: 1fr;
+  }
+  .stk-stage {
+    order: -1;
+    min-height: 0;
+    aspect-ratio: 1 / 1.05;
+  }
+}
+@media (max-width: 760px) {
+  .stk-cap {
+    display: none;
+  }
+}
+
+/* ============================== phases: three stations on one line ============================== */
+/* One 9s loop: the packet holds at each station; each card lights while the packet is at its station. */
+.ln-line {
+  --loop: 9s;
+}
+.ln-rail {
+  position: relative;
+  height: 2.6rem;
+  margin-bottom: 0.4rem;
+}
+.ln-rail-draw {
+  position: absolute;
+  left: calc(100% / 6);
+  right: calc(100% / 6);
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--line-2);
+  transform-origin: left;
+}
+.ln-station {
+  position: absolute;
+  top: 50%;
+  translate: -50% -50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1.5px var(--line-2);
+  /* lights up while the packet stops at it */
+  animation: ln-stn var(--loop) linear infinite;
+}
+/* stations are the 3rd–5th spans in the rail, after the drawn line and the packet */
+.ln-station:nth-of-type(4) {
+  animation-delay: calc(var(--loop) * 0.33);
+}
+.ln-station:nth-of-type(5) {
+  animation-delay: calc(var(--loop) * 0.66);
+}
+@keyframes ln-stn {
+  0%,
+  26% {
+    box-shadow: inset 0 0 0 1.5px var(--blue);
+  }
+  32%,
+  100% {
+    box-shadow: inset 0 0 0 1.5px var(--line-2);
+  }
+}
+.ln-station i {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--line-2);
+}
+/* The carrier spans station 1 to station 3, so translateX(50%) lands on station 2 and 100% on station 3. */
+.ln-packet {
+  position: absolute;
+  top: 50%;
+  left: calc(100% / 6);
+  right: calc(100% / 6);
+  z-index: 2;
+  height: 0;
+  animation: ln-run var(--loop) var(--ease-io) infinite;
+}
+.ln-packet::before {
+  content: '';
+  position: absolute;
+  left: -1.2rem;
+  top: -0.35rem;
+  width: 2.4rem;
+  height: 0.7rem;
+  border-radius: 99px;
+  background: var(--blue);
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--blue) 18%, transparent);
+}
+@keyframes ln-run {
+  0%,
+  24% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  33%,
+  57% {
+    transform: translateX(50%);
+  }
+  66%,
+  90% {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+  96% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  97% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+/* The loop waits until the rail has drawn in; until then the packet is hidden and every light holds still. */
+.ln-line:not(.is-run) .ln-packet {
+  visibility: hidden;
+}
+.ln-line:not(.is-run) :is(.ln-packet, .ln-station, .ln-card, .ln-art .sketch .sk-live) {
+  animation-play-state: paused;
+}
+.ln-cards {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.8rem, 1.5vw, 1.2rem);
+}
+.ln-card {
+  position: relative;
+  padding: clamp(1.3rem, 2.4vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  animation: ln-card var(--loop) linear infinite;
+}
+.ln-card:nth-child(2) {
+  animation-delay: calc(var(--loop) * 0.33);
+}
+.ln-card:nth-child(3) {
+  animation-delay: calc(var(--loop) * 0.66);
+}
+@keyframes ln-card {
+  0%,
+  26% {
+    box-shadow:
+      inset 0 0 0 1.5px var(--blue),
+      var(--shadow);
+  }
+  32%,
+  100% {
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+}
+.ln-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+.ln-k {
+  color: var(--blue-ink);
+}
+.ln-art {
+  width: 7rem;
+  color: var(--ink-2);
+}
+.ln-art .sketch .sk-live {
+  stroke: currentColor;
+  animation: ln-ink var(--loop) linear infinite;
+}
+.ln-card:nth-child(1) .ln-art .sk-live {
+  animation-delay: 0s;
+}
+.ln-card:nth-child(2) .ln-art .sk-live {
+  animation-delay: calc(var(--loop) * 0.33);
+}
+.ln-card:nth-child(3) .ln-art .sk-live {
+  animation-delay: calc(var(--loop) * 0.66);
+}
+@keyframes ln-ink {
+  0%,
+  26% {
+    stroke: var(--blue);
+  }
+  32%,
+  100% {
+    stroke: currentColor;
+  }
+}
+.ln-name {
+  margin-top: 1.4rem;
+  font-size: clamp(1.4rem, 2.2vw, 1.95rem);
+  font-weight: 580;
+  font-stretch: 110%;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+.ln-tag {
+  margin-top: 0.35rem;
+  color: var(--ink-2);
+}
+.ln-items {
+  list-style: none;
+  padding: 0;
+  margin-top: 1.2rem;
+}
+.ln-items li {
+  position: relative;
+  padding: 0.5rem 0 0.5rem 1rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.94rem;
+}
+.ln-items li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.05rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--line-2);
+}
+@media (max-width: 900px) {
+  .ln-line {
+    position: relative;
+    padding-left: 2.2rem;
+  }
+  .ln-rail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1.4rem;
+    height: auto;
+    margin: 0;
+  }
+  .ln-rail-draw {
+    left: 50%;
+    right: auto;
+    top: calc(100% / 6);
+    bottom: calc(100% / 6);
+    width: 2px;
+    height: auto;
+    margin: 0 0 0 -1px;
+    transform-origin: top;
+  }
+  .ln-station {
+    left: 50% !important;
+  }
+  .ln-station:nth-of-type(3) {
+    top: calc(100% / 6);
+  }
+  .ln-station:nth-of-type(4) {
+    top: 50%;
+  }
+  .ln-station:nth-of-type(5) {
+    top: calc(100% * 5 / 6);
+  }
+  .ln-packet {
+    display: none;
+  }
+  .ln-cards {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ln-packet,
+  .ln-station,
+  .ln-card,
+  .ln-art .sketch .sk-live {
+    animation: none !important;
+  }
+}
+
+/* engagement models */
+.models {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-top: clamp(3rem, 6vw, 5rem);
+}
+.model {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+  padding-top: 1.3rem;
+  border-top: 1px solid var(--ink);
+}
+.model .mono {
+  color: var(--ink-3);
+}
+.model-meter {
+  display: flex;
+  gap: 4px;
+  margin-top: 0.4rem;
+}
+.model-meter i {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--line);
+  transform-origin: left;
+}
+.model-meter i.on {
+  background: var(--ink);
+}
+@media (max-width: 860px) {
+  .models {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,150 +1,115 @@
 'use client';
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/react';
+import dynamic from 'next/dynamic';
+import { useInView, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { productionLayer } from '@/lib/approach';
 import { Reveal } from '../Reveal';
 import { SplitHeading } from '../SplitHeading';
 
-const ease = [0.16, 1, 0.3, 1] as const;
+const StackCanvas = dynamic(() => import('../three/StackScene'), { ssr: false, loading: () => <div className="stk-loading" /> });
+
 const N = productionLayer.length;
 
-/* Ring of six arcs around the core, one per part of the Production Layer. */
-const CX = 170;
-const CY = 170;
-const R = 118;
-function arc(i: number) {
-  const gap = 0.07;
-  const a0 = (i / N) * Math.PI * 2 - Math.PI / 2 + gap;
-  const a1 = ((i + 1) / N) * Math.PI * 2 - Math.PI / 2 - gap;
-  const p = (a: number) => `${(CX + R * Math.cos(a)).toFixed(1)} ${(CY + R * Math.sin(a)).toFixed(1)}`;
-  return `M${p(a0)}A${R} ${R} 0 0 1 ${p(a1)}`;
-}
-function tick(i: number) {
-  const a = ((i + 0.5) / N) * Math.PI * 2 - Math.PI / 2;
-  const r0 = R + 12;
-  const r1 = R + 26;
-  return `M${(CX + r0 * Math.cos(a)).toFixed(1)} ${(CY + r0 * Math.sin(a)).toFixed(1)}L${(CX + r1 * Math.cos(a)).toFixed(1)} ${(CY + r1 * Math.sin(a)).toFixed(1)}`;
-}
-
-/** The Sifars Production Layer as a guided sequence: each part lights up in turn and completes the ring. */
+/**
+ * The Sifars Production Layer as "the steps to production": six platforms, each with a working model of its part.
+ * A packet climbs the steps on its own; the step it is on lights up and the list follows.
+ * Hovering or focusing a part holds it while the pointer or focus stays there; clicking pins it until clicked again.
+ */
 export function Schematic() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(N - 1);
-  const [pinned, setPinned] = useState(false);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
+  const ref = useRef<HTMLElement>(null);
+  const visible = useInView(ref, { margin: '200px 0px 200px 0px' });
+  const reduced = useReducedMotion();
+  const [active, setActive] = useState(0);
+  const [hover, setHover] = useState<number | null>(null);
+  const [focused, setFocused] = useState<number | null>(null);
+  const [pinned, setPinned] = useState<number | null>(null);
+  const [webgl, setWebgl] = useState(true);
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1001px) and (prefers-reduced-motion: no-preference)');
-    const set = () => {
-      setPinned(mq.matches);
-      if (!mq.matches) setActive(N - 1);
-    };
-    set();
-    mq.addEventListener('change', set);
-    return () => mq.removeEventListener('change', set);
+    try {
+      const c = document.createElement('canvas');
+      const gl = c.getContext('webgl2') || c.getContext('webgl');
+      setWebgl(!!gl);
+      // Release the probe context straight away so it does not count against the browser's limit.
+      gl?.getExtension('WEBGL_lose_context')?.loseContext();
+    } catch {
+      setWebgl(false);
+    }
   }, []);
 
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    if (!pinned) return;
-    setActive(Math.min(N - 1, Math.max(0, Math.floor(v * N * 0.999))));
-  });
-
-  useEffect(() => {
-    if (pinned) setActive(Math.min(N - 1, Math.max(0, Math.floor(scrollYProgress.get() * N * 0.999))));
-  }, [pinned, scrollYProgress]);
-
-  const left = productionLayer.slice(0, 3);
-  const right = productionLayer.slice(3);
-  const cur = productionLayer[active];
-
-  const go = (k: number) => {
-    if (!pinned || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    const span = r.height - window.innerHeight;
-    const y = window.scrollY + r.top + span * ((k + 0.5) / N);
-    if (window.__lenis) window.__lenis.scrollTo(y, { duration: 1.1 });
-    else window.scrollTo({ top: y, behavior: 'smooth' });
-  };
-
-  const item = (i: number, title: string, body: string) => {
-    const state = i < active ? 'done' : i === active ? 'now' : 'next';
-    return (
-      <li key={title} className={`callout is-${state}`}>
-        <button type="button" className="callout-btn" onClick={() => go(i)} aria-current={state === 'now' ? 'step' : undefined}>
-          <span className="callout-n mono num">{String(i + 1).padStart(2, '0')}</span>
-          <span className="callout-txt">
-            <span className="callout-t">{title}</span>
-            <span className="callout-b">{body}</span>
-          </span>
-          <span className="callout-lead" aria-hidden="true" />
-        </button>
-      </li>
-    );
+  // The pointer wins over keyboard focus, and both win over a pinned step.
+  const hold = hover ?? focused ?? pinned;
+  // Reduced motion: no travelling packet, the visitor steps through by hovering or tapping.
+  const held = reduced ? (hold ?? active) : hold;
+  const titles = productionLayer.map((l) => l.title);
+  const show = (i: number) => setActive(i);
+  const togglePin = (i: number) => {
+    const unpin = pinned === i;
+    setPinned(unpin ? null : i);
+    // Unpinning lets the packet go straight away, even while the pointer (or a tap's emulated hover) is still on the item.
+    if (unpin) setHover(null);
+    show(i);
   };
 
   return (
-    <section className="schem" aria-labelledby="schem-h">
-      <div ref={ref} className={`schem-scroll ${pinned ? 'is-pinned' : ''}`}>
-        <div className="schem-stick">
-          <div className="wrap">
-            <div className="sec-head">
-              <SplitHeading id="schem-h" parts={['Production-ready means more than', { live: '“it works in a demo.”' }]} />
-              <Reveal delay={0.1}>
-                <p className="lead">The Sifars Production Layer covers the six parts that usually break later, mapped before the build starts.</p>
-              </Reveal>
-            </div>
-            <div className="schem-grid">
-              <ol className="schem-col">
-                {left.map((l, i) => item(i, l.title, l.body))}
-              </ol>
-              <div className="schem-core" aria-hidden="true">
-                <svg viewBox="0 0 340 340">
-                  <circle cx={CX} cy={CY} r={R + 40} className="schem-outer" />
-                  {productionLayer.map((_, i) => (
-                    <g key={i}>
-                      <path d={arc(i)} className="schem-arc-base" />
-                      <motion.path
-                        d={arc(i)}
-                        className="schem-arc"
-                        initial={false}
-                        animate={{ pathLength: i <= active ? 1 : 0, opacity: i <= active ? 1 : 0 }}
-                        transition={{ duration: 0.8, ease }}
-                      />
-                      <path d={tick(i)} className={`schem-tick ${i <= active ? 'on' : ''}`} />
-                    </g>
-                  ))}
-                  <motion.circle
-                    cx={CX}
-                    cy={CY}
-                    r={70}
-                    className="schem-hub"
-                    animate={{ scale: active === N - 1 ? 1 : 0.94 }}
-                    transition={{ duration: 0.8, ease }}
-                    style={{ transformOrigin: `${CX}px ${CY}px` }}
-                  />
-                </svg>
-                <div className="schem-center">
-                  <AnimatePresence mode="popLayout" initial={false}>
-                    <motion.div
-                      key={active}
-                      className="schem-center-in"
-                      initial={{ opacity: 0, y: 14, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, y: -14, filter: 'blur(4px)' }}
-                      transition={{ duration: 0.5, ease }}
-                    >
-                      <span className="mono num">
-                        {String(active + 1).padStart(2, '0')} / {String(N).padStart(2, '0')}
+    <section ref={ref} className="stk section" aria-labelledby="schem-h">
+      <div className="wrap">
+        <div className="sec-head">
+          <SplitHeading id="schem-h" parts={['Production-ready means more than', { live: '“it works in a demo.”' }]} />
+          <Reveal delay={0.1}>
+            <p className="lead">The Sifars Production Layer covers the six parts that usually break later, mapped before the build starts.</p>
+          </Reveal>
+        </div>
+        <div className="stk-grid">
+          <ol className="stk-list" aria-label="The six parts of the Production Layer" onMouseLeave={() => setHover(null)}>
+            {productionLayer.map((l, i) => {
+              const on = i === active;
+              return (
+                <li key={l.title}>
+                  <button
+                    type="button"
+                    aria-current={on ? 'step' : undefined}
+                    aria-pressed={pinned === i}
+                    className={`stk-item ${on ? 'is-on' : ''} ${i < active ? 'is-done' : ''}`}
+                    onMouseEnter={() => {
+                      setHover(i);
+                      show(i);
+                    }}
+                    onFocus={(e) => {
+                      // Only keyboard focus holds a step; a mouse click also focuses the button, but clicks pin instead.
+                      if (!e.currentTarget.matches(':focus-visible')) return;
+                      setFocused(i);
+                      show(i);
+                    }}
+                    onBlur={() => setFocused(null)}
+                    onClick={() => togglePin(i)}
+                  >
+                    <span className="stk-num mono num">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="stk-txt">
+                      <span className="stk-title">{l.title}</span>
+                      <span className="stk-body">
+                        <span>{l.body}</span>
                       </span>
-                      <span className="schem-center-t">{active === N - 1 ? 'In production' : cur.title}</span>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="stk-stage sheet">
+            <span className="ticks" aria-hidden="true" />
+            {webgl ? (
+              <StackCanvas titles={titles} active={active} hold={held} onActive={show} onSelect={togglePin} live={visible} still={!!reduced} />
+            ) : (
+              <div className="stk-fallback" aria-hidden="true">
+                {titles.map((t, i) => (
+                  <span key={t} className={i === active ? 'is-on' : ''} />
+                ))}
               </div>
-              <ol className="schem-col schem-col--r" start={4}>
-                {right.map((l, i) => item(i + 3, l.title, l.body))}
-              </ol>
-            </div>
+            )}
+            <p className="mono stk-cap">
+              {String(active + 1).padStart(2, '0')} / {String(N).padStart(2, '0')} · the steps to production
+            </p>
           </div>
         </div>
       </div>

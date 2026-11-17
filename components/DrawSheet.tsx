@@ -76,7 +76,8 @@ const ROUTE_STOPS = [
   { x: 800, title: 'Questions', sub: 'Users, data, systems' },
 ];
 
-const PACKET_PATH = 'M248 170h84c34 0 34-62 68-62h240c34 0 34 62 68 62h402';
+// Same geometry as ROUTE_PATH, joined through the boxes so the packet never leaves the drawn line.
+const PACKET_PATH = 'M248 170h84c34 0 34-62 68-62h280c34 0 34 62 68 62h362';
 const STOP_X = [148, 540, 900, 1110];
 const ROUTE_DUR = 5.2;
 
@@ -211,6 +212,7 @@ const ART: Record<SheetKind, (moving: boolean) => ReactNode> = {
       </T>
       <Dash d="M90 334h1020" i={8} />
       <T x={90} y={358} i={4}>Fourth Floor, Blue Sapphire · Sector 74, Mohali</T>
+      <Dash d="M620 112h470" i={9} />
       {m && <Packet path="M620 112h470" dur={5} />}
     </>
   ),

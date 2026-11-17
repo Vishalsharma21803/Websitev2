@@ -216,23 +216,47 @@ function SoloDirector() {
   return null;
 }
 
+/* Gentle side-to-side sway: keeps the model alive without ever turning it out of frame. */
+function Sway({ children }: { children: React.ReactNode }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (ref.current) ref.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.35) * 0.32;
+  });
+  return <group ref={ref}>{children}</group>;
+}
+
 export function SoloCanvas({ which }: { which: 0 | 1 | 2 | 3 }) {
   const theme = useTheme();
   const pal = useMemo(() => palette(theme), [theme]);
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
   const Obj = [WebPlatform, MobileApp, Agent, Flow][which];
-  const cam: [number, number, number] = which === 3 ? [1.3, 3.4, 6.0] : which === 1 ? [1.4, 0.65, 6.6] : [1.7, 0.8, 6.8];
+  // Frame each object around its own centre, far enough back that the sway and a drag never swing it out of the panel.
+  const view = {
+    0: { cam: [2.6, 1.0, 8.6], target: [0.3, -0.25, -0.2] },
+    1: { cam: [1.4, 0.6, 5.6], target: [0, 0, 0] },
+    2: { cam: [2.2, 0.9, 7.4], target: [0.4, 0, 0] },
+    3: { cam: [1.6, 4.0, 7.2], target: [0, 0.1, 0] },
+  }[which] as { cam: [number, number, number]; target: [number, number, number] };
+  // Narrow panels need the camera further back so the whole model stays in frame.
+  const far = typeof window !== 'undefined' && window.innerWidth < 760 ? 1.6 : 1;
+  const cam: [number, number, number] = [
+    view.target[0] + (view.cam[0] - view.target[0]) * far,
+    view.target[1] + (view.cam[1] - view.target[1]) * far,
+    view.target[2] + (view.cam[2] - view.target[2]) * far,
+  ];
   if (!ready) return null;
   return (
     <Canvas className="solo-canvas" dpr={[1, 1.75]} camera={{ fov: 30, position: cam }} gl={{ antialias: true, alpha: true }} flat aria-hidden="true">
       <SoloDirector />
       <ambientLight intensity={theme === 'dark' ? 1.4 : 2.1} />
       <directionalLight position={[4, 7, 5]} intensity={1.4} />
-      <group position={which === 3 ? [0, -0.2, 0] : [0, 0, 0]}>
-        <Obj pal={pal} index={0} delay={0} />
-      </group>
-      <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.6} minPolarAngle={0.6} maxPolarAngle={1.75} target={[0, which === 3 ? 0 : 0, 0]} />
+      <Sway>
+        <group position={which === 3 ? [0, -0.2, 0] : [0, 0, 0]}>
+          <Obj pal={pal} index={0} delay={0} />
+        </group>
+      </Sway>
+      <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={0.6} maxPolarAngle={1.75} minAzimuthAngle={-0.9} maxAzimuthAngle={0.9} target={view.target} />
     </Canvas>
   );
 }
